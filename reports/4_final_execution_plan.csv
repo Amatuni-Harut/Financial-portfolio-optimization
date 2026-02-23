@@ -1,4 +1,10 @@
-Ticker,Shares_To_Buy,Execution_Price,Sum_Invested,Ideal_Weight_%,Actual_Weight_%,Remaining_Budget
-AAPL,19,268.79,5107.01,52.32,52.8,326.72
-AMGN,12,380.52,4566.27,47.66,47.2,326.72
-HON,0,243.88,0.0,0.02,0.0,326.72
+Ticker,Shares,Price,Invested_Sum,Weight_%,Note
+AAPL,19.0,268.99,5110.81,52.81,Asset Component
+AMGN,12.0,380.54,4566.48,47.19,Asset Component
+HON,0.0,244.02,0.0,0.0,Asset Component
+---,,,,,---
+TOTAL_BUDGET,,,10000.0,100.0,Initial Capital
+CASH_LEFT,,,322.71,,Remaining Funds
+PORTFOLIO_RETURN,,,0.000709,,Daily Expected Return
+PORTFOLIO_RISK,,,0.012921,,Daily Volatility
+PORTFOLIO_SHARPE,,,0.0395,,Sharpe Ratio
