@@ -1,0 +1,4 @@
+Ticker,Shares_To_Buy,Execution_Price,Sum_Invested,Ideal_Weight_%,Actual_Weight_%,Remaining_Budget
+AAPL,19,268.79,5107.01,52.32,52.8,326.72
+AMGN,12,380.52,4566.27,47.66,47.2,326.72
+HON,0,243.88,0.0,0.02,0.0,326.72
