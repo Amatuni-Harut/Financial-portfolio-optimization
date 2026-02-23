@@ -1,10 +1,8 @@
-Ticker,Shares,Price,Invested_Sum,Weight_%,Note
-AAPL,19.0,268.99,5110.81,52.81,Asset Component
-AMGN,12.0,380.54,4566.48,47.19,Asset Component
-HON,0.0,244.02,0.0,0.0,Asset Component
----,,,,,---
-TOTAL_BUDGET,,,10000.0,100.0,Initial Capital
-CASH_LEFT,,,322.71,,Remaining Funds
-PORTFOLIO_RETURN,,,0.000709,,Daily Expected Return
-PORTFOLIO_RISK,,,0.012921,,Daily Volatility
-PORTFOLIO_SHARPE,,,0.0395,,Sharpe Ratio
+Ticker,Shares,Sum,Weight_%
+AAPL,19.0,5116.35,52.83
+AMGN,12.0,4568.16,47.17
+HON,0.0,0.0,0.0
+MONTHLY_RETURN,,0.014893,
+MONTHLY_RISK,,0.059218,
+PORTFOLIO_SHARPE,,0.1811,
+CASH_LEFT,,315.49,
