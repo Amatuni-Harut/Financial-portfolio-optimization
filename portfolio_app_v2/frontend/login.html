@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetAlpha — Вход</title>
+    <script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');})()</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-branding">
+        <div class="branding-content">
+            <div class="branding-logo">AA</div>
+            <h1 class="branding-title">AssetAlpha</h1>
+            <p class="branding-subtitle">Профессиональный терминал для фундаментального анализа акций и оптимизации портфеля.</p>
+            <div class="branding-features">
+                <div class="branding-feature">
+                    <div class="feature-icon">✓</div>
+                    Доступ к финансовой отчётности и мультипликаторам в реальном времени.
+                </div>
+                <div class="branding-feature">
+                    <div class="feature-icon">✓</div>
+                    Моделирование стресс-тестов для вашего инвестиционного портфеля.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-form-container">
+        <button class="theme-toggle-btn" id="themeToggle" aria-label="Переключить тему">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+            </svg>
+        </button>
+
+        <div class="knowledge-block">
+            <h3>Выберите уровень знаний</h3>
+            <p class="knowledge-subtitle">Это поможет настроить интерфейс под вас</p>
+            <div class="btn-group">
+                <button id="beginnerBtn" class="btn btn-secondary">Новичок</button>
+                <button id="proBtn" class="btn btn-primary">Профессионал</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/appState.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

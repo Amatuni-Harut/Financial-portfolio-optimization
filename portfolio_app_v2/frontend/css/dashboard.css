@@ -1,0 +1,28 @@
+/*
+ * dashboard.css — стили специфичные для главной страницы (портфель).
+ * Дополняет main.css.
+ */
+
+/* ============================================================
+   PRO FEATURES BLOCK
+============================================================ */
+.pro-feature-block {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(161, 163, 100, 0.06);
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toggle-label .toggle-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}

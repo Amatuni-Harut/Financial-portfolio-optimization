@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Portfolio Optimizer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --bg:#0a0c10; --surface:#111520; --border:#1e2535;
+    --accent:#00e5a0; --accent2:#0077ff; --warn:#ff6b35;
+    --text:#c8d0e0; --text-dim:#5a6478;
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px)}
+  .logo{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.08em;color:var(--accent)}
+  .logo span{color:var(--text-dim);font-weight:400}
+  .badge{font-family:var(--mono);font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:20px;color:var(--text-dim)}
+  .app{display:grid;grid-template-columns:340px 1fr;flex:1}
+  aside{border-right:1px solid var(--border);padding:28px 24px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;max-height:calc(100vh - 61px);position:sticky;top:61px}
+  .section-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  label{font-size:12px;color:var(--text-dim)}
+  input[type=number],input[type=text]{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:9px 12px;font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;width:100%}
+  input:focus{border-color:var(--accent)}
+  .ticker-input-wrap{position:relative}
+  #tickerInput{padding-right:70px}
+  .ticker-add-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);color:#000;border:none;border-radius:4px;padding:4px 10px;font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer}
+  .ticker-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{display:flex;align-items:center;gap:5px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);border-radius:4px;padding:3px 8px;font-family:var(--mono);font-size:11px;color:var(--accent)}
+  .tag .rm{color:var(--text-dim);cursor:pointer;font-size:13px;line-height:1}
+  .tag .rm:hover{color:var(--warn)}
+  .methods-grid{display:flex;flex-direction:column;gap:8px}
+  .method-opt{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px;transition:border-color .2s,background .2s}
+  .method-opt:has(input:checked){border-color:rgba(0,229,160,.4);background:rgba(0,229,160,.04)}
+  .method-opt input{accent-color:var(--accent);width:14px;height:14px}
+  .method-name{font-size:13px;font-weight:500}
+  .method-desc{font-size:11px;color:var(--text-dim);margin-top:1px}
+  #runBtn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:13px;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;cursor:pointer;width:100%;transition:opacity .2s,transform .1s}
+  #runBtn:hover{opacity:.9} #runBtn:active{transform:scale(0.98)} #runBtn:disabled{opacity:.4;cursor:not-allowed}
+  .presets{display:flex;flex-wrap:wrap;gap:6px}
+  .preset-btn{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-family:var(--mono);font-size:10px;padding:4px 8px;cursor:pointer;transition:color .2s,border-color .2s}
+  .preset-btn:hover{color:var(--accent);border-color:rgba(0,229,160,.4)}
+  main{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;gap:32px}
+  .state-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-dim);padding:80px 20px}
+  .state-empty .icon{font-size:48px;opacity:.3}
+  .state-empty p{font-size:14px;text-align:center;max-width:320px;line-height:1.6}
+  .loader{display:flex;align-items:center;gap:12px;justify-content:center;padding:80px;color:var(--text-dim);font-family:var(--mono);font-size:13px}
+  .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .error-box{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.3);border-radius:8px;padding:16px 20px;color:var(--warn);font-size:13px;font-family:var(--mono)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px}
+  .card-title{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px}
+  .best-badge{display:inline-block;background:rgba(0,229,160,.12);color:var(--accent);border:1px solid rgba(0,229,160,.3);border-radius:4px;font-size:9px;font-family:var(--mono);padding:2px 7px;vertical-align:middle;margin-left:8px;letter-spacing:.08em}
+  .tabs{display:flex;gap:2px;margin-bottom:20px}
+  .tab{padding:8px 16px;font-family:var(--mono);font-size:12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-dim);background:transparent;transition:all .2s}
+  .tab.active{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.4);color:var(--accent)}
+  .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+  .metric{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .metric-label{font-size:10px;color:var(--text-dim);font-family:var(--mono);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase}
+  .metric-value{font-family:var(--mono);font-size:20px;font-weight:600}
+  .metric-value.pos{color:var(--accent)} .metric-value.neg{color:var(--warn)} .metric-value.neu{color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+  th{text-align:left;padding:8px 10px;color:var(--text-dim);border-bottom:1px solid var(--border);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+  td{padding:9px 10px;border-bottom:1px solid rgba(30,37,53,.6)}
+  tr:last-child td{border-bottom:none} tr:hover td{background:rgba(255,255,255,.02)}
+  .weight-bar-wrap{display:flex;align-items:center;gap:8px}
+  .weight-bar{height:4px;border-radius:2px;background:var(--accent);min-width:2px}
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .chart-wrap{position:relative;height:280px}
+  .best-col{color:var(--accent)!important}
+  .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .stock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px}
+  .stock-ticker{font-family:var(--mono);font-size:14px;font-weight:600}
+  .stock-price{font-family:var(--mono);font-size:12px;color:var(--text-dim)}
+  .stock-ret{font-family:var(--mono);font-size:12px;margin-top:8px}
+  .stock-ret.pos{color:var(--accent)} .stock-ret.neg{color:var(--warn)}
+  .corr-matrix{overflow-x:auto}
+  .corr-table td,.corr-table th{font-family:var(--mono);font-size:11px;text-align:center;padding:6px 10px;border-bottom:1px solid rgba(30,37,53,.4)}
+  @media(max-width:900px){.app{grid-template-columns:1fr};aside{max-height:none;position:static}.metrics-row{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">PORTFOLIO<span>_</span>OPTIMIZER</div>
+  <div class="badge">v1.0 · Sharpe Maximizer</div>
+</header>
+<div class="app">
+  <aside>
+    <div>
+      <div class="section-label">Presets</div>
+      <div class="presets">
+        <button class="preset-btn" data-preset="tech">Tech Giants</button>
+        <button class="preset-btn" data-preset="mixed">Mixed US</button>
+        <button class="preset-btn" data-preset="energy">Energy + Finance</button>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Assets</div>
+      <div class="ticker-input-wrap">
+        <input id="tickerInput" type="text" placeholder="AAPL" maxlength="10"/>
+        <button class="ticker-add-btn" id="addTickerBtn">ADD</button>
+      </div>
+      <div class="ticker-tags" id="tickerTags"></div>
+    </div>
+    <div class="form-group">
+      <div class="section-label">Budget (USD)</div>
+      <input type="number" id="budget" value="10000" min="500" step="500"/>
+    </div>
+    <div class="form-group">
+      <div class="section-label">Risk-Free Rate (% /year)</div>
+      <input type="number" id="rfRate" value="2.0" min="0" max="20" step="0.1"/>
+    </div>
+    <div>
+      <div class="section-label">Methods</div>
+      <div class="methods-grid">
+        <label class="method-opt">
+          <input type="checkbox" name="method" value="monte_carlo" checked/>
+          <div><div class="method-name">Monte Carlo</div><div class="method-desc">10,000 random portfolios</div></div>
+        </label>
+        <label class="method-opt">
+          <input type="checkbox" name="method" value="greedy" checked/>
+          <div><div class="method-name">Greedy</div><div class="method-desc">Step-by-step Sharpe climb</div></div>
+        </label>
+        <label class="method-opt">
+          <input type="checkbox" name="method" value="equal_weight" checked/>
+          <div><div class="method-name">Equal Weight</div><div class="method-desc">Baseline 1/N allocation</div></div>
+        </label>
+      </div>
+    </div>
+    <button id="runBtn">⚡ RUN OPTIMIZATION</button>
+  </aside>
+  <main id="main">
+    <div class="state-empty" id="emptyState">
+      <div class="icon">◈</div>
+      <p>Configure your portfolio in the sidebar, then click <strong>Run Optimization</strong>.</p>
+    </div>
+  </main>
+</div>
+<script>
+const state = { tickers:["AAPL","MSFT","GOOGL","JPM","XOM"], activeTab:0, result:null };
+const PRESETS = {
+  tech:  ["AAPL","MSFT","GOOGL","META","NVDA"],
+  mixed: ["AAPL","MSFT","JPM","XOM","AMZN"],
+  energy:["XOM","JPM","HON","AMGN","BRK-B"],
+};
+renderTags();
+document.getElementById("addTickerBtn").onclick = addTicker;
+document.getElementById("tickerInput").onkeydown = e => { if(e.key==="Enter") addTicker(); };
+document.getElementById("runBtn").onclick = runOptimization;
+document.querySelectorAll(".preset-btn").forEach(btn => {
+  btn.onclick = () => { state.tickers=[...PRESETS[btn.dataset.preset]]; renderTags(); };
+});
+function addTicker(){
+  const inp=document.getElementById("tickerInput");
+  const t=inp.value.trim().toUpperCase();
+  if(!t||state.tickers.includes(t)){inp.value="";return;}
+  state.tickers.push(t); inp.value=""; renderTags();
+}
+function removeTicker(t){ state.tickers=state.tickers.filter(x=>x!==t); renderTags(); }
+function renderTags(){
+  document.getElementById("tickerTags").innerHTML=state.tickers.map(t=>
+    `<span class="tag">${t}<span class="rm" onclick="removeTicker('${t}')">×</span></span>`
+  ).join("");
+}
+async function runOptimization(){
+  if(state.tickers.length<2){showError("Добавьте минимум 2 тикера.");return;}
+  const methods=[...document.querySelectorAll('input[name=method]:checked')].map(i=>i.value);
+  if(!methods.length){showError("Выберите хотя бы один метод.");return;}
+  const budget=parseFloat(document.getElementById("budget").value);
+  const rfRate=parseFloat(document.getElementById("rfRate").value)/100;
+  showLoading();
+  document.getElementById("runBtn").disabled=true;
+  try{
+    const resp=await fetch("/optimize",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({tickers:state.tickers,budget,risk_free_rate:rfRate,methods}),
+    });
+    if(!resp.ok){const err=await resp.json();throw new Error(err.detail||`HTTP ${resp.status}`);}
+    state.result=await resp.json(); state.activeTab=0; renderResults();
+  }catch(e){showError(e.message);}
+  finally{document.getElementById("runBtn").disabled=false;}
+}
+function showLoading(){document.getElementById("main").innerHTML=`<div class="loader"><div class="spinner"></div> Running optimization...</div>`;}
+function showError(msg){document.getElementById("main").innerHTML=`<div class="error-box">⚠ ${msg}</div>`;}
+function fmt$(v){return`$${Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;}
+function fmtPct(v){return`${v>=0?'+':''}${Number(v).toFixed(4)}%`;}
+function fmtN(v,d=4){return Number(v).toFixed(d);}
+function cls(v){return v>=0?'pos':'neg';}
+function renderResults(){
+  const r=state.result; const portfolios=r.portfolios; const bestName=r.best_portfolio;
+  const tabsHtml=portfolios.map((p,i)=>
+    `<button class="tab ${i===state.activeTab?'active':''}" onclick="switchTab(${i})">${p.name}${p.name===bestName?'<span class="best-badge">BEST</span>':''}</button>`
+  ).join("");
+  const active=portfolios[state.activeTab]; const m=active.metrics;
+  const metricsHtml=`
+    <div class="metrics-row">
+      <div class="metric"><div class="metric-label">Budget Used</div><div class="metric-value neu">${fmt$(m.budget)}</div></div>
+      <div class="metric"><div class="metric-label">Monthly Return</div><div class="metric-value ${cls(m.monthly_profit)}">${fmtPct(m.return_pct)}</div></div>
+      <div class="metric"><div class="metric-label">Sharpe Ratio</div><div class="metric-value ${cls(m.sharpe)}">${fmtN(m.sharpe)}</div></div>
+      <div class="metric"><div class="metric-label">Monthly Profit</div><div class="metric-value ${cls(m.monthly_profit)}">${fmt$(m.monthly_profit)}</div></div>
+      <div class="metric"><div class="metric-label">Monthly Risk (σ)</div><div class="metric-value neg">${fmt$(m.monthly_risk)}</div></div>
+      <div class="metric"><div class="metric-label">Payback</div><div class="metric-value neu">${m.payback_months<9999?m.payback_months+' mo':'∞'}</div></div>
+    </div>`;
+  const holdingsRows=active.tickers.map((t,i)=>`
+    <tr><td><strong>${t}</strong></td><td>${active.shares[i]}</td><td>${fmtN(active.weights[i]*100,1)}%</td>
+    <td><div class="weight-bar-wrap"><div class="weight-bar" style="width:${Math.max(active.weights[i]*200,2)}px"></div><span>${fmtN(active.weights[i]*100,1)}%</span></div></td></tr>`
+  ).join("");
+  const compRows=[
+    ["Budget ($)",p=>fmt$(p.metrics.budget)],
+    ["Monthly Return",p=>fmtPct(p.metrics.return_pct)],
+    ["Monthly Profit",p=>fmt$(p.metrics.monthly_profit)],
+    ["Monthly Risk",p=>fmt$(p.metrics.monthly_risk)],
+    ["Sharpe Ratio",p=>fmtN(p.metrics.sharpe)],
+    ["Payback (mo)",p=>p.metrics.payback_months<9999?p.metrics.payback_months:'∞'],
+  ].map(([label,fn])=>`<tr><td>${label}</td>${portfolios.map(p=>`<td ${p.name===bestName?'class="best-col"':''}>${fn(p)}</td>`).join("")}</tr>`).join("");
+  const stockCards=r.stock_stats.map(s=>`
+    <div class="stock-card">
+      <div class="stock-ticker">${s.ticker}</div>
+      <div class="stock-price">${fmt$(s.price)}</div>
+      <div class="stock-ret ${cls(s.mean_ret_pct)}">${fmtPct(s.mean_ret_pct)}/mo</div>
+      <div style="font-size:10px;color:var(--text-dim);font-family:var(--mono);margin-top:4px">σ ${fmtN(s.std_ret_pct,2)}% · Sh ${fmtN(s.sharpe,2)}</div>
+    </div>`).join("");
+  const corr=r.correlation;
+  const corrHeaderCells=corr.tickers.map(t=>`<th>${t}</th>`).join("");
+  const corrRows=corr.tickers.map((t,i)=>{
+    const cells=corr.matrix[i].map(v=>{
+      const abs=Math.abs(v); const hue=v>=0?'142,227,173':'255,100,80';
+      return `<td style="color:rgb(${hue});opacity:${0.3+abs*0.7}">${fmtN(v,2)}</td>`;
+    }).join("");
+    return `<tr><th>${t}</th>${cells}</tr>`;
+  }).join("");
+  document.getElementById("main").innerHTML=`
+    <div class="card">
+      <div class="card-title">Portfolio Results</div>
+      <div class="tabs">${tabsHtml}</div>
+      ${metricsHtml}
+      <table><thead><tr><th>Ticker</th><th>Shares</th><th>Weight</th><th>Allocation</th></tr></thead><tbody>${holdingsRows}</tbody></table>
+    </div>
+    <div class="charts-grid">
+      <div class="card"><div class="card-title">Efficient Frontier</div><div class="chart-wrap"><canvas id="frontierChart"></canvas></div></div>
+      <div class="card"><div class="card-title">Portfolio Allocation</div><div class="chart-wrap"><canvas id="allocationChart"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Strategy Comparison</div>
+      <div style="overflow-x:auto">
+      <table><thead><tr><th>Metric</th>${portfolios.map(p=>`<th ${p.name===bestName?'class="best-col"':''}>${p.name}${p.name===bestName?' ★':''}</th>`).join("")}</tr></thead><tbody>${compRows}</tbody></table>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Asset Analysis (Monthly)</div><div class="stock-grid">${stockCards}</div></div>
+    <div class="card">
+      <div class="card-title">Correlation Matrix</div>
+      <div class="corr-matrix"><table class="corr-table"><thead><tr><th></th>${corrHeaderCells}</tr></thead><tbody>${corrRows}</tbody></table></div>
+    </div>`;
+  renderCharts(r,active);
+}
+function switchTab(i){state.activeTab=i;renderResults();}
+function renderCharts(r,active){
+  const fCtx=document.getElementById("frontierChart").getContext("2d");
+  const frontier=r.efficient_frontier;
+  const sharpes=frontier.map(p=>p.sharpe);
+  const minSh=Math.min(...sharpes),maxSh=Math.max(...sharpes);
+  new Chart(fCtx,{type:"scatter",data:{datasets:[{label:"Portfolios",data:frontier.map(p=>({x:p.risk,y:p.return})),pointRadius:2,pointBackgroundColor:frontier.map(p=>{const t=(p.sharpe-minSh)/(maxSh-minSh+1e-9);return`rgba(${Math.round(255*(1-t))},${Math.round(229*t)},${Math.round(160*t)},0.6)`;}),pointBorderColor:"transparent"},...r.portfolios.map(p=>({label:p.name,data:[{x:p.metrics.monthly_risk/p.metrics.budget*100,y:p.metrics.return_pct}],pointRadius:8,pointStyle:"star",pointBackgroundColor:p.name===r.best_portfolio?"#00e5a0":"#0077ff",pointBorderColor:"#fff",pointBorderWidth:1.5}))]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#5a6478",font:{family:"IBM Plex Mono",size:10}}}},scales:{x:{title:{display:true,text:"Risk (%/mo)",color:"#5a6478",font:{family:"IBM Plex Mono",size:10}},ticks:{color:"#5a6478"},grid:{color:"#1e2535"}},y:{title:{display:true,text:"Return (%/mo)",color:"#5a6478",font:{family:"IBM Plex Mono",size:10}},ticks:{color:"#5a6478"},grid:{color:"#1e2535"}}}}});
+  const aCtx=document.getElementById("allocationChart").getContext("2d");
+  const colors=["#00e5a0","#0077ff","#ff6b35","#a855f7","#f59e0b","#06b6d4","#84cc16","#ec4899","#14b8a6","#f97316"];
+  new Chart(aCtx,{type:"doughnut",data:{labels:active.tickers,datasets:[{data:active.weights.map(w=>(w*100).toFixed(2)),backgroundColor:colors.slice(0,active.tickers.length),borderColor:"#111520",borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:"65%",plugins:{legend:{position:"right",labels:{color:"#c8d0e0",font:{family:"IBM Plex Mono",size:11},padding:12}}}}});
+}
+</script>
+</body>
+</html>
