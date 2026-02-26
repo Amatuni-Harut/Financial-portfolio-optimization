@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Data files
+data/
+*.csv
+*.xlsx
+
+# Reports
+reports/
+*.pdf
+*.png
+
+# Environment
+.env
+venv/
+
+# OS
+.DS_Store
