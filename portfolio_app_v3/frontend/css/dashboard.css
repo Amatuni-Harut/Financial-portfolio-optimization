@@ -1,0 +1,102 @@
+/*
+ * dashboard.css — стили для главной страницы.
+ * Дополняет main.css.
+ */
+
+/* ============================================================
+   PRO FEATURES BLOCK
+============================================================ */
+.pro-feature-block {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(161, 163, 100, 0.06);
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toggle-label .toggle-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.toggle-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* ============================================================
+   ASSET CARD — поля для ограничений
+============================================================ */
+.asset-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.asset-info {
+    flex: 1;
+    min-width: 80px;
+}
+
+.asset-ticker {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.asset-name {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.asset-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.asset-field-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.asset-input {
+    width: 72px;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ============================================================
+   BOOTSTRAP STATUS (login)
+============================================================ */
+.bootstrap-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(161, 163, 100, 0.08);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
