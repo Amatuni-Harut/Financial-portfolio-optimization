@@ -1,0 +1,428 @@
+/*
+ * dashboard.css — стили для главной страницы.
+ * Дополняет main.css.
+ */
+
+/* ============================================================
+   PRO FEATURES BLOCK
+============================================================ */
+.pro-feature-block {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(161, 163, 100, 0.06);
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toggle-label .toggle-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.toggle-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* ============================================================
+   ASSET TABLE (new table-style layout)
+============================================================ */
+.asset-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.asset-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.asset-table thead tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.asset-table thead th {
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.asset-table thead th:first-child {
+    width: 48px;
+    text-align: left;
+}
+
+.asset-table thead th.th-actions {
+    width: 60px;
+    text-align: center;
+}
+
+.asset-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+
+.asset-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.asset-table tbody tr:hover {
+    background: rgba(161,163,100,0.04);
+}
+
+.asset-table tbody td {
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+
+.asset-table tbody td:first-child {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Row number + "(More)" link */
+.row-num-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 42px;
+}
+
+.more-link {
+    font-size: 11px;
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+/* Ticker input cell */
+.ticker-cell {
+    position: relative;
+}
+
+.ticker-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-primary);
+    transition: border-color 0.15s;
+}
+
+.ticker-input-wrap:focus-within {
+    border-color: var(--accent);
+}
+
+.ticker-text-input {
+    flex: 1;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 7px 10px !important;
+    font-size: 13px !important;
+    color: var(--text-primary) !important;
+    min-width: 0;
+}
+
+.ticker-text-input::placeholder {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.ticker-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+
+.ticker-search-btn:hover {
+    color: var(--accent);
+    background: rgba(161,163,100,0.08);
+}
+
+.ticker-search-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Percent input cell */
+.pct-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-primary);
+    transition: border-color 0.15s;
+    min-width: 80px;
+}
+
+.pct-input-wrap:focus-within {
+    border-color: var(--accent);
+}
+
+.pct-input {
+    flex: 1;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 7px 8px !important;
+    font-size: 13px !important;
+    color: var(--text-primary) !important;
+    min-width: 0;
+    width: 60px;
+    text-align: right;
+}
+
+.pct-input::placeholder {
+    color: var(--text-muted);
+}
+
+.pct-suffix {
+    padding: 0 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+/* Total row */
+.asset-table tfoot td {
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+}
+
+.total-alloc-cell {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.total-alloc-val {
+    flex: 1;
+    padding: 6px 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px 0 0 6px;
+    font-size: 13px;
+    min-width: 60px;
+    text-align: right;
+}
+
+.total-alloc-suffix {
+    padding: 6px 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Dropdown search results for table rows */
+.ticker-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ticker-dropdown.active {
+    display: block;
+}
+
+.ticker-dropdown .search-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.ticker-dropdown .search-item:hover {
+    background: rgba(161,163,100,0.08);
+}
+
+.ticker-dropdown .search-ticker {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+}
+
+.ticker-dropdown .search-name {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* Row action buttons */
+.row-delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: color 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row-delete-btn:hover {
+    color: var(--negative);
+    background: rgba(194,120,120,0.1);
+}
+
+.table-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px 6px;
+    font-size: 11px;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-action-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(161,163,100,0.06);
+}
+
+.table-action-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* Filled ticker badge inside table cell */
+.ticker-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+}
+
+.ticker-badge-name {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+/* ============================================================
+   ASSET CARD — поля для ограничений (kept for compatibility)
+============================================================ */
+.asset-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.asset-info {
+    flex: 1;
+    min-width: 80px;
+}
+
+.asset-ticker {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.asset-name {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.asset-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.asset-field-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.asset-input {
+    width: 72px;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ============================================================
+   BOOTSTRAP STATUS (login)
+============================================================ */
+.bootstrap-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(161, 163, 100, 0.08);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфель — AssetAlpha</title>
+    <script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');})()</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Открыть меню">
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard">
+
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon">AA</div>
+                <span class="logo-text">AssetAlpha</span>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-label">Главное</div>
+                <a href="index.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Портфель
+                </a>
+                <a href="markets.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                    Скринер рынка
+                </a>
+            </nav>
+            <nav class="nav-section">
+                <div class="nav-label">Аккаунт</div>
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.6 9a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9"/>
+                    </svg>
+                    Настройки
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="theme-toggle">
+                    <div class="theme-toggle-label">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                        </svg>
+                        Тема
+                    </div>
+                    <div class="theme-switch" id="themeSwitch"></div>
+                </div>
+                <button class="logout-btn" onclick="window.location.href='login.html'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Выход
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p class="header-subtitle">Оптимизация инвестиционного портфеля</p>
+                </div>
+            </div>
+
+            <div class="container">
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <div class="status-dot"></div>
+                    <span class="status-text">API Connected</span>
+                    <span class="status-text">•</span>
+                    <span class="status-text" id="cacheStatus">Cache: Ready</span>
+                    <span class="status-text">•</span>
+                    <span class="status-text" id="assetCount">Активов: 0</span>
+                </div>
+
+                <!-- Параметры модели -->
+                <div class="card animate-in">
+                    <div class="card-header">
+                        <h2 class="card-title">⚙️ Параметры модели</h2>
+                        <span class="badge">ОБЯЗАТЕЛЬНО</span>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Начальная дата</label>
+                            <input type="date" id="startDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Конечная дата</label>
+                            <input type="date" id="endDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Бюджет ($)</label>
+                            <input type="number" id="budget" class="form-input"
+                                value="10000" step="100" min="100" max="100000000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Безрисковая ставка (%)</label>
+                            <input type="number" id="riskFreeRate" class="form-input"
+                                value="2.0" step="0.1" min="0" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Модель оптимизации</label>
+                            <select id="algorithm" class="form-select">
+                                <option value="max_sharpe">Максимальный Sharpe Ratio</option>
+                                <option value="min_volatility">Минимальная волатильность</option>
+                                <option value="equal_weight">Равные веса</option>
+                                <option value="monte_carlo">Monte Carlo</option>
+                                <option value="risk_parity">Risk Parity</option>
+                                <option value="min_cvar">Минимальный CVaR</option>
+                                <option value="all">Все модели (сравнение)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Макс. активов в портфеле</label>
+                            <input type="number" id="maxAssets" class="form-input"
+                                value="" placeholder="Без ограничений" min="2" max="20">
+                        </div>
+                    </div>
+
+                    <!-- Только для professional — управляется через JS -->
+                    <div id="proFeatures" style="display:none;" class="pro-feature-block">
+                        <label class="toggle-label">
+                            <span class="toggle-title">Ручные веса и ограничения (Диверсификация)</span>
+                            <div class="toggle-switch" id="diversificationToggle"></div>
+                        </label>
+                        <p class="toggle-hint">
+                            Включите, чтобы задать min/max % для каждого актива
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Assets — таблица активов -->
+                <div class="card animate-in" style="animation-delay:0.1s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Portfolio Assets
+                            <button class="table-action-btn" onclick="clearAllAssets()" title="Очистить всё" style="margin-left:8px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+                                </svg>
+                            </button>
+                            <button class="table-action-btn" id="colToggleBtn" onclick="toggleExtraColumns()" title="Min/Max веса" style="margin-left:4px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                                    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                                </svg>
+                            </button>
+                        </h2>
+                        <span class="badge" id="assetBadge">0 ВЫБРАНО</span>
+                    </div>
+
+                    <!-- Поиск -->
+                    <div class="search-wrapper" style="margin-bottom:16px;">
+                        <input type="text" id="searchInput" class="search-input form-input"
+                            placeholder="Поиск тикеров (например, AAPL, MSFT)...">
+                        <span class="search-icon">🔍</span>
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+
+                    <!-- Таблица активов -->
+                    <div id="assetList" class="asset-table-wrap">
+                        <!-- renderAssetList() fills this -->
+                    </div>
+                </div>
+
+                <!-- Кнопки -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="optimizeBtn">🚀 Запуск алгоритма</button>
+                    <button class="btn btn-secondary" id="refreshDataBtn">🔄 Обновить данные</button>
+                </div>
+
+                <!-- Loader -->
+                <div id="loader" class="loader">
+                    <div class="spinner"></div>
+                    <p class="loader-text">// Вычисление оптимального распределения портфеля...</p>
+                </div>
+
+                <!--
+                    Результаты — контейнер полностью управляется dashboard.js.
+                    dashboard.js очищает и заполняет этот div в зависимости
+                    от уровня знаний и данных пришедших с бэкенда.
+                -->
+                <div id="results" style="display:none;"></div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="js/appState.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

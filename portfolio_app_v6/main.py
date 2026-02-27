@@ -139,21 +139,44 @@ async def _bootstrap_if_needed():
         logger.error(f"Bootstrap не удался: {e}")
 
 TICKER_NAMES = {
+    # Technology
     "AAPL":  ("Apple Inc.", "Technology"),
     "MSFT":  ("Microsoft Corporation", "Technology"),
     "GOOGL": ("Alphabet Inc.", "Technology"),
-    "AMZN":  ("Amazon.com Inc.", "Consumer Cyclical"),
     "NVDA":  ("NVIDIA Corporation", "Technology"),
     "META":  ("Meta Platforms Inc.", "Technology"),
+    "AVGO":  ("Broadcom Inc.", "Technology"),
+    "ORCL":  ("Oracle Corporation", "Technology"),
+    "CRM":   ("Salesforce Inc.", "Technology"),
+    "ADBE":  ("Adobe Inc.", "Technology"),
+    "INTC":  ("Intel Corporation", "Technology"),
+    # Consumer
+    "AMZN":  ("Amazon.com Inc.", "Consumer Cyclical"),
     "TSLA":  ("Tesla Inc.", "Consumer Cyclical"),
+    "HD":    ("Home Depot Inc.", "Consumer Cyclical"),
+    "MCD":   ("McDonald's Corporation", "Consumer Defensive"),
+    "PG":    ("Procter & Gamble Co.", "Consumer Defensive"),
+    "KO":    ("Coca-Cola Company", "Consumer Defensive"),
+    "WMT":   ("Walmart Inc.", "Consumer Defensive"),
+    # Financial
     "JPM":   ("JPMorgan Chase & Co.", "Financial Services"),
     "V":     ("Visa Inc.", "Financial Services"),
-    "JNJ":   ("Johnson & Johnson", "Healthcare"),
-    "XOM":   ("Exxon Mobil Corporation", "Energy"),
-    "PG":    ("Procter & Gamble Co.", "Consumer Defensive"),
+    "MA":    ("Mastercard Inc.", "Financial Services"),
     "BRK-B": ("Berkshire Hathaway Inc.", "Financial Services"),
+    "BAC":   ("Bank of America Corp.", "Financial Services"),
+    "GS":    ("Goldman Sachs Group Inc.", "Financial Services"),
+    # Healthcare
+    "JNJ":   ("Johnson & Johnson", "Healthcare"),
+    "UNH":   ("UnitedHealth Group Inc.", "Healthcare"),
+    "LLY":   ("Eli Lilly and Company", "Healthcare"),
     "AMGN":  ("Amgen Inc.", "Healthcare"),
+    "PFE":   ("Pfizer Inc.", "Healthcare"),
+    # Energy & Industrials
+    "XOM":   ("Exxon Mobil Corporation", "Energy"),
+    "CVX":   ("Chevron Corporation", "Energy"),
     "HON":   ("Honeywell International", "Industrials"),
+    "CAT":   ("Caterpillar Inc.", "Industrials"),
+    "BA":    ("Boeing Company", "Industrials"),
 }
 
 @app.get("/api/stocks/search", tags=["Data"])
@@ -221,6 +244,15 @@ async def optimize(request: OptimizeRequest):
             detail=f"Загружено менее 2 тикеров: {available}"
         )
 
+    # Автоматически рассчитываем бюджет как сумму quantity × текущая цена
+    auto_budget = sum(
+        quantities.get(t, 0) * latest_prices.get(t, 0)
+        for t in available
+    )
+    # Если расчёт не получился (нет цен), используем переданный budget
+    effective_budget = auto_budget if auto_budget >= 100 else request.budget
+    logger.info(f"Авто-бюджет: ${effective_budget:.2f} (из quantity × price)")
+
     effective_model = "all" if is_pro else request.optimization_model.value
 
     try:
@@ -228,7 +260,7 @@ async def optimize(request: OptimizeRequest):
             tickers=available,
             returns_wide=returns_wide,
             latest_prices=latest_prices,
-            budget=request.budget,
+            budget=effective_budget,
             risk_free_rate=request.risk_free_rate,
             optimization_model=effective_model,
             allocation_limits=alloc_limits,

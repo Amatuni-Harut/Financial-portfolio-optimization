@@ -221,6 +221,15 @@ async def optimize(request: OptimizeRequest):
             detail=f"Загружено менее 2 тикеров: {available}"
         )
 
+    # Автоматически рассчитываем бюджет как сумму quantity × текущая цена
+    auto_budget = sum(
+        quantities.get(t, 0) * latest_prices.get(t, 0)
+        for t in available
+    )
+    # Если расчёт не получился (нет цен), используем переданный budget
+    effective_budget = auto_budget if auto_budget >= 100 else request.budget
+    logger.info(f"Авто-бюджет: ${effective_budget:.2f} (из quantity × price)")
+
     effective_model = "all" if is_pro else request.optimization_model.value
 
     try:
@@ -228,7 +237,7 @@ async def optimize(request: OptimizeRequest):
             tickers=available,
             returns_wide=returns_wide,
             latest_prices=latest_prices,
-            budget=request.budget,
+            budget=effective_budget,
             risk_free_rate=request.risk_free_rate,
             optimization_model=effective_model,
             allocation_limits=alloc_limits,
