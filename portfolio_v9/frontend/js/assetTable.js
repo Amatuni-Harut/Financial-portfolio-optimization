@@ -1,0 +1,338 @@
+/**
+ * assetTable.js — Управление таблицей активов.
+ *
+ * Извлечено из dashboard.js (v6) для уменьшения размера файла.
+ * Отвечает за: добавление/удаление активов, рендер таблицы,
+ * валидацию allocation, event delegation для строк таблицы.
+ *
+ * Улучшения v7:
+ * 1. Event delegation вместо inline onclick="" в строках таблицы:
+ *    в v6 каждая строка имела до 5 атрибутов onchange/onclick
+ *    → XSS-риск при специальных символах в тикерах.
+ * 2. showError() / showConfirm() вместо alert() / confirm().
+ * 3. XSS-защита: escapeAttr() для всех data-атрибутов.
+ */
+
+// ================================================================
+// СОСТОЯНИЕ ТАБЛИЦЫ
+// ================================================================
+
+const TableState = {
+    showMinMax:  true,
+    showAllRows: false,
+};
+const TABLE_ROWS = 10;  // Строк до кнопки "ещё"
+
+
+// ================================================================
+// ДОБАВЛЕНИЕ / УДАЛЕНИЕ АКТИВОВ
+// ================================================================
+
+function addAsset(ticker, name, sector) {
+    if (DashboardState.assets.some(a => a.ticker === ticker)) {
+        showToast(`${ticker} уже добавлен`, 'info');
+        return;
+    }
+    DashboardState.assets.push({ ticker, name, sector,
+        quantity: null, weight: null, minWeight: null, maxWeight: null });
+    document.getElementById('searchInput').value = '';
+    hideSearch();
+    renderAssetList();
+}
+
+function removeAsset(ticker) {
+    DashboardState.assets = DashboardState.assets.filter(a => a.ticker !== ticker);
+    renderAssetList();
+}
+
+async function clearAllAssets() {
+    if (!DashboardState.assets.length) return;
+    const ok = await showConfirm('Очистить список активов?');
+    if (ok) {
+        DashboardState.assets = [];
+        renderAssetList();
+    }
+}
+
+function toggleExtraColumns() {
+    TableState.showMinMax = !TableState.showMinMax;
+    renderAssetList();
+}
+
+
+// ================================================================
+// ОБНОВЛЕНИЕ ПОЛЕЙ АКТИВА
+// ================================================================
+
+function updateAssetField(ticker, field, value) {
+    const asset = DashboardState.assets.find(a => a.ticker === ticker);
+    if (!asset) return;
+
+    asset[field] = value !== '' ? parseFloat(value) : null;
+    if (field === 'quantity') updateBudgetDisplay();
+    if (field === 'weight')   updateAllocWarning();
+}
+
+/** Обновляет отображение авто-бюджета */
+function updateBudgetDisplay() {
+    const budgetVal    = document.getElementById('budgetValue');
+    const budgetHidden = document.getElementById('budget');
+
+    if (DashboardState.lastResult?.input_portfolio) {
+        const budget = DashboardState.lastResult.input_portfolio.metrics?.budget;
+        if (budget && budgetVal) {
+            budgetVal.textContent = '$' + Number(budget).toLocaleString('en-US', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2,
+            });
+            if (budgetHidden) budgetHidden.value = budget;
+            return;
+        }
+    }
+
+    const totalShares = DashboardState.assets.reduce((s, a) => s + (a.quantity || 0), 0);
+    if (budgetVal) {
+        budgetVal.textContent = totalShares > 0 ? `${totalShares} акций` : '—';
+    }
+}
+
+function updateAllocWarning() {
+    const assets = DashboardState.assets;
+    const filled = assets.some(a => a.weight != null && a.weight > 0);
+    if (!filled) { renderAllocWarning(null); return; }
+    const total = assets.reduce((sum, a) => sum + (a.weight || 0), 0);
+    renderAllocWarning(total);
+}
+
+function renderAllocWarning(total) {
+    let el = document.getElementById('allocWarning');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'allocWarning';
+        const wrap = document.getElementById('assetList');
+        if (wrap) wrap.parentNode.insertBefore(el, wrap.nextSibling);
+    }
+
+    if (total === null) { el.innerHTML = ''; return; }
+
+    const diff = Math.abs(total - 100).toFixed(1);
+    if (Math.abs(total - 100) < 0.1) {
+        el.innerHTML = `<div class="alloc-warning warn-ok">✅ Сумма Allocation = 100%</div>`;
+    } else if (total < 100) {
+        el.innerHTML = `<div class="alloc-warning warn-under">⚠️ Allocation = ${total.toFixed(1)}% — не хватает ${diff}%</div>`;
+    } else {
+        el.innerHTML = `<div class="alloc-warning warn-over">❌ Allocation = ${total.toFixed(1)}% — превышает на ${diff}%</div>`;
+    }
+}
+
+
+// ================================================================
+// РЕНДЕР ТАБЛИЦЫ АКТИВОВ
+// ================================================================
+
+function renderAssetList() {
+    const container = document.getElementById('assetList');
+    const badge     = document.getElementById('assetBadge');
+    const countEl   = document.getElementById('assetCount');
+    const isPro     = AppState.get('knowledgeLevel') === 'professional';
+    const isManual  = DashboardState.isManualWeights;
+    const assets    = DashboardState.assets;
+    const n         = assets.length;
+
+    if (badge)   badge.textContent   = `${n} ВЫБРАНО`;
+    if (countEl) countEl.textContent = `Активов: ${n}`;
+
+    updateBudgetDisplay();
+
+    const showMin    = TableState.showMinMax && isPro;
+    const showMax    = TableState.showMinMax && isPro;
+    const showManual = isManual && isPro;
+
+    const displayed = (TableState.showAllRows || n <= TABLE_ROWS)
+        ? assets
+        : assets.slice(0, TABLE_ROWS);
+    const hasMore = n > TABLE_ROWS && !TableState.showAllRows;
+
+    const rows = displayed.map((a, i) => {
+        const isLastVisible = i === displayed.length - 1 && hasMore;
+        // Используем data-атрибуты — без inline onclick (XSS-безопасно)
+        return `
+        <tr>
+            <td>
+                <div class="row-num-cell">
+                    <span>${i + 1}</span>
+                    ${isLastVisible
+                        ? `<span class="more-link" data-action="show-all">(More)</span>`
+                        : ''}
+                </div>
+            </td>
+            <td class="ticker-cell">
+                <div class="ticker-input-wrap">
+                    <span class="ticker-badge">
+                        <span style="color:var(--accent);font-weight:700;">${escapeHtml(a.ticker)}</span>
+                        <span class="ticker-badge-name">${a.name ? '— ' + escapeHtml(a.name) : ''}</span>
+                    </span>
+                    <button class="ticker-search-btn"
+                            data-action="search-ticker"
+                            data-ticker="${escapeAttr(a.ticker)}"
+                            title="Поиск">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+            <td>
+                <div class="pct-input-wrap">
+                    <input type="number" class="pct-input" placeholder="шт."
+                           min="1" step="1" value="${a.quantity ?? ''}"
+                           data-action="update-field"
+                           data-ticker="${escapeAttr(a.ticker)}"
+                           data-field="quantity">
+                </div>
+            </td>
+            <td>
+                <div class="pct-input-wrap">
+                    <input type="number" class="pct-input" placeholder=""
+                           min="0" max="100" step="0.1" value="${a.weight ?? ''}"
+                           data-action="update-field"
+                           data-ticker="${escapeAttr(a.ticker)}"
+                           data-field="weight">
+                    <span class="pct-suffix">%</span>
+                </div>
+            </td>
+            ${showMin ? `<td>
+                <div class="pct-input-wrap">
+                    <input type="number" class="pct-input" placeholder="0"
+                           min="0" max="100" step="0.1" value="${a.minWeight ?? ''}"
+                           data-action="update-field"
+                           data-ticker="${escapeAttr(a.ticker)}"
+                           data-field="minWeight">
+                    <span class="pct-suffix">%</span>
+                </div>
+            </td>` : ''}
+            ${showMax ? `<td>
+                <div class="pct-input-wrap">
+                    <input type="number" class="pct-input" placeholder="100"
+                           min="0" max="100" step="0.1" value="${a.maxWeight ?? ''}"
+                           data-action="update-field"
+                           data-ticker="${escapeAttr(a.ticker)}"
+                           data-field="maxWeight">
+                    <span class="pct-suffix">%</span>
+                </div>
+            </td>` : ''}
+            ${showManual ? `<td>
+                <div class="pct-input-wrap">
+                    <input type="number" class="pct-input" placeholder="%"
+                           min="0" max="100" step="0.1" value="${a.weight ?? ''}"
+                           data-action="update-field"
+                           data-ticker="${escapeAttr(a.ticker)}"
+                           data-field="weight">
+                    <span class="pct-suffix">%</span>
+                </div>
+            </td>` : ''}
+            <td style="text-align:center;">
+                <button class="row-delete-btn"
+                        data-action="remove-asset"
+                        data-ticker="${escapeAttr(a.ticker)}"
+                        title="Удалить">✕</button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    const totalAlloc  = assets.reduce((sum, a) => sum + (a.weight || 0), 0);
+    const allocFilled = assets.some(a => a.weight != null && a.weight > 0);
+    const overLimit   = totalAlloc > 100.05;
+    const underLimit  = allocFilled && totalAlloc < 99.95;
+    const totalColor  = overLimit  ? 'color:var(--negative);font-weight:700;'
+                      : underLimit ? 'color:#d4a574;font-weight:700;'
+                      : allocFilled ? 'color:var(--positive);font-weight:700;' : '';
+
+    const extraCols = (showMin ? 1 : 0) + (showMax ? 1 : 0) + (showManual ? 1 : 0);
+
+    container.innerHTML = `
+        <table class="asset-table">
+            <thead>
+                <tr>
+                    <th style="width:48px;">&nbsp;</th>
+                    <th>Тикер</th>
+                    <th>Кол-во акций</th>
+                    <th>Allocation</th>
+                    ${showMin ? '<th>Min. Weight</th>' : ''}
+                    ${showMax ? '<th>Max. Weight</th>' : ''}
+                    ${showManual ? '<th>Вес %</th>' : ''}
+                    <th class="th-actions" style="width:40px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows || `<tr><td colspan="${5 + extraCols}" style="text-align:center;padding:24px;color:var(--text-muted);">
+                    Добавьте минимум 2 актива через строку поиска выше
+                </td></tr>`}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Total</strong></td>
+                    <td>
+                        <div class="total-alloc-cell" style="${totalColor}">
+                            <span style="${totalColor}">${totalAlloc > 0 ? totalAlloc.toFixed(1) : 0}</span>
+                            <span class="pct-suffix">%</span>
+                        </div>
+                    </td>
+                    ${Array(extraCols).fill('<td></td>').join('')}
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>`;
+
+    // Event delegation — один слушатель на всю таблицу
+    container.addEventListener('change', handleTableChange);
+    container.addEventListener('click',  handleTableClick);
+    updateAllocWarning();
+}
+
+/** Делегат для change-событий (поля ввода) */
+function handleTableChange(e) {
+    const input = e.target.closest('[data-action="update-field"]');
+    if (!input) return;
+    updateAssetField(input.dataset.ticker, input.dataset.field, input.value);
+}
+
+/** Делегат для click-событий (кнопки удаления, поиска, "ещё") */
+function handleTableClick(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const action = el.dataset.action;
+
+    if (action === 'remove-asset')  removeAsset(el.dataset.ticker);
+    if (action === 'search-ticker') openTickerSearch(el.dataset.ticker);
+    if (action === 'show-all') {
+        TableState.showAllRows = true;
+        renderAssetList();
+    }
+}
+
+function openTickerSearch(currentTicker) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = currentTicker;
+        searchInput.focus();
+        handleSearch(currentTicker);
+    }
+}
+
+
+// ================================================================
+// УТИЛИТЫ XSS-ЗАЩИТЫ
+// ================================================================
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function escapeAttr(str) {
+    return String(str)
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
