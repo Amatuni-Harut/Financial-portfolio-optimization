@@ -1,0 +1,42 @@
+# ============================================================
+# AssetAlpha v13.1 — Зависимости
+# Зафиксированы минорные версии для воспроизводимости сборки.
+# Для обновления: pip install pip-tools && pip-compile
+# ============================================================
+
+# --- Web Framework -----------------------------------------------------------
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.20        # для OAuth2PasswordRequestForm
+
+# --- Database (async) --------------------------------------------------------
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0                 # async PostgreSQL драйвер
+psycopg2-binary==2.9.10         # sync драйвер для connect.py (ETL)
+
+# --- Configuration -----------------------------------------------------------
+pydantic==2.10.3
+pydantic-settings==2.7.0
+
+# --- Auth / Security ---------------------------------------------------------
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.1
+passlib[bcrypt]==1.7.4
+
+# --- Data / Finance ----------------------------------------------------------
+pandas==2.2.3
+numpy==2.1.3
+yfinance==0.2.50
+scipy==1.14.1
+
+# --- Migrations --------------------------------------------------------------
+alembic==1.14.0
+
+# --- Testing -----------------------------------------------------------------
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1                   # для async TestClient
+
+# --- Dev tools (optional, не нужны в production) ----------------------------
+# ruff==0.8.2
+# mypy==1.13.0

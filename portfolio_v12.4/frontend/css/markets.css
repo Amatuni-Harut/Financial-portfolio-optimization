@@ -1,0 +1,452 @@
+/*
+ * markets.css — стили для скринера рынка с группировкой по секторам.
+ */
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+.markets-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+.market-main-col { display: flex; flex-direction: column; gap: 16px; }
+.markets-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+/* ============================================================
+   SEARCH & FILTERS
+============================================================ */
+.search-filters {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.search-filters .search-wrapper { flex: 1; min-width: 200px; }
+
+.filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.filter-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+.filter-tab:hover  { background: var(--bg-card); color: var(--text-primary); }
+.filter-tab.active { background: var(--accent-gradient); border-color: transparent; color: var(--bg-primary); }
+
+/* ============================================================
+   SECTOR TABS
+============================================================ */
+.sector-tabs-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: 4px;
+}
+.sector-tabs-wrapper::-webkit-scrollbar { display: none; }
+
+.sector-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 4px 2px;
+    width: max-content;
+    min-width: 100%;
+}
+
+.sector-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.sector-tab:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+.sector-tab.active {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.sector-tab-icon { font-size: 15px; }
+
+/* ============================================================
+   SECTOR HEADER (над таблицей при выборе сектора)
+============================================================ */
+.sector-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    animation: fadeInUp 0.2s ease;
+}
+
+.sector-header-icon {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.sector-header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sector-header-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ============================================================
+   MARKET TABLE
+============================================================ */
+.market-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.market-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.market-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.market-table tbody tr { transition: background 0.15s ease; }
+.market-table tbody tr:hover { background-color: var(--bg-card-hover); }
+.market-table tbody tr:last-child td { border-bottom: none; }
+
+.text-right { text-align: right !important; }
+
+.coin-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.coin-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.coin-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.coin-name   { font-size: 14px; font-weight: 600; }
+.coin-symbol { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* Маленький бейдж сектора в строке таблицы */
+.coin-sector-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.price-cell  { font-weight: 600; }
+.change-cell { font-weight: 600; }
+.change-cell.positive { color: var(--positive); }
+.change-cell.negative { color: var(--negative); }
+
+.table-loading, .table-empty, .table-error {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+.table-loading .spinner { width: 32px; height: 32px; border-width: 2px; }
+
+/* ============================================================
+   TRENDING WIDGET
+============================================================ */
+.trending-list { display: flex; flex-direction: column; gap: 4px; }
+
+.trending-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: padding-left 0.15s ease;
+}
+.trending-item:last-child { border-bottom: none; }
+.trending-item:hover { padding-left: 6px; }
+
+.trending-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.trending-coin { display: flex; align-items: center; gap: 10px; flex: 1; }
+
+.trending-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.trending-name   { font-size: 13px; font-weight: 600; }
+.trending-symbol { font-size: 11px; color: var(--text-muted); }
+
+.trending-change { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.trending-change.positive { color: var(--positive); }
+.trending-change.negative { color: var(--negative); }
+
+/* ============================================================
+   SECTOR SUMMARY (сайдбар)
+============================================================ */
+.sector-summary-list { display: flex; flex-direction: column; }
+
+.sector-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    transition: padding-left 0.15s ease, background 0.15s ease;
+    border-radius: 6px;
+}
+.sector-summary-item:last-child { border-bottom: none; }
+.sector-summary-item:hover {
+    padding-left: 6px;
+    background: var(--bg-card-hover);
+}
+
+.sector-summary-icon {
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.sector-summary-info { flex: 1; min-width: 0; }
+.sector-summary-name  { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.sector-summary-count { font-size: 11px; color: var(--text-muted); }
+
+.sector-summary-change { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.sector-summary-change.positive { color: var(--positive); }
+.sector-summary-change.negative { color: var(--negative); }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px var(--shadow);
+    animation: fadeInUp 0.25s ease;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-title-group { display: flex; align-items: center; gap: 14px; }
+
+.modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.modal-header h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+
+.modal-sector-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.close-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.close-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+.modal-body { padding: 24px 28px; }
+
+.modal-metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.modal-metrics-table tbody tr { border-bottom: 1px solid var(--border); }
+.modal-metrics-table tbody tr:last-child { border-bottom: none; }
+
+.modal-metrics-table .mmt-label {
+    padding: 11px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    width: 26%;
+    border-right: 1px solid var(--border);
+}
+
+.modal-metrics-table .mmt-value {
+    padding: 11px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 24%;
+    border-right: 1px solid var(--border);
+}
+.modal-metrics-table .mmt-value:last-child { border-right: none; }
+.modal-metrics-table .positive { color: var(--positive); }
+.modal-metrics-table .negative { color: var(--negative); }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 1200px) {
+    .markets-grid { grid-template-columns: 1fr; }
+    .markets-sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+    .markets-grid { grid-template-columns: 1fr; }
+    .markets-sidebar { display: flex; flex-direction: column; }
+    .search-filters { flex-direction: column; align-items: stretch; }
+    .coin-sector-badge { display: none; }
+}
