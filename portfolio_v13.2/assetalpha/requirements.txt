@@ -12,7 +12,7 @@ python-multipart==0.0.20        # для OAuth2PasswordRequestForm
 # --- Database (async) --------------------------------------------------------
 sqlalchemy[asyncio]==2.0.36
 asyncpg==0.30.0                 # async PostgreSQL драйвер
-psycopg2-binary==2.9.10         # sync драйвер для connect.py (ETL)
+psycopg2-binary>=2.9.9         # sync драйвер для connect.py (ETL)
 
 # --- Configuration -----------------------------------------------------------
 pydantic==2.10.3

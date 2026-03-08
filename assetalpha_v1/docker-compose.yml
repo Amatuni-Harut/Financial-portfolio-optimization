@@ -1,0 +1,79 @@
+# ============================================================
+# AssetAlpha v14.0 — Docker Compose
+# Запускает два сервиса одной командой: приложение + PostgreSQL
+#
+# Команды:
+#   docker compose up --build        # первый запуск / после изменений кода
+#   docker compose up -d             # фоновый запуск
+#   docker compose down              # остановка
+#   docker compose logs -f api       # логи приложения в реальном времени
+#   docker compose exec db psql -U postgres -d assetalpha  # войти в БД
+# ============================================================
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: assetalpha_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Укажите POSTGRES_PASSWORD в .env}
+      POSTGRES_DB:       ${POSTGRES_DB:-assetalpha}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # данные сохраняются между перезапусками
+    ports:
+      - "5433:5432"   # 5433 на хосте → 5432 внутри контейнера (5432 занят локальным PostgreSQL)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-assetalpha}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ── FastAPI приложение ──────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: assetalpha_api
+    restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    depends_on:
+      db:
+        condition: service_healthy   # ждём пока PostgreSQL готов принимать соединения
+    environment:
+      # DB_URL для контейнера — хост "db" (имя сервиса выше), НЕ localhost
+      DB_URL:                        postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-assetalpha}
+      SECRET_KEY:                    ${SECRET_KEY:?Укажите SECRET_KEY в .env}
+      ACCESS_TOKEN_EXPIRE_MINUTES:   ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      CORS_ORIGINS:                  ${CORS_ORIGINS:-http://localhost:8000}
+      CACHE_TTL_HOURS:               ${CACHE_TTL_HOURS:-4}
+      LOG_LEVEL:                     ${LOG_LEVEL:-INFO}
+      RATE_LIMIT_AUTH:               ${RATE_LIMIT_AUTH:-5}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./frontend:/app/frontend:ro
+      - /home/harutyun/.cache/py-yfinance:/home/appuser/.cache/py-yfinance:ro
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    command: >
+      sh -c "
+        echo 'Ожидание готовности БД...' &&
+        alembic upgrade head &&
+        echo 'Миграции применены' &&
+        uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2
+      "
+
+volumes:
+  postgres_data:
+    driver: local

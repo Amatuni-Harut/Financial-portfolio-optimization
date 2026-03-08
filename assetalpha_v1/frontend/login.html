@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetAlpha — Вход</title>
+    <script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');})()</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+        /* Auth tabs */
+        .auth-tabs { display:flex; gap:0; margin-bottom:24px; border-radius:10px; overflow:hidden; border:1px solid var(--border); }
+        .auth-tab  { flex:1; padding:10px; background:transparent; border:none; color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+        .auth-tab.active { background:var(--accent); color:#fff; }
+        .auth-tab:hover:not(.active) { background:var(--surface-hover,rgba(255,255,255,.05)); }
+
+        /* Auth form */
+        .auth-section { display:none; }
+        .auth-section.active { display:block; }
+        .auth-input-group { margin-bottom:14px; }
+        .auth-input-group label { display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+        .auth-input { width:100%; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; box-sizing:border-box; transition:border-color .2s; }
+        .auth-input:focus { outline:none; border-color:var(--accent); }
+        .auth-btn { width:100%; padding:11px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; transition:opacity .2s; margin-top:4px; }
+        .auth-btn:hover { opacity:.88; }
+        .auth-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .auth-error { color:#e05252; font-size:13px; margin-top:8px; text-align:center; min-height:18px; }
+        .auth-success { color:#52e07a; font-size:13px; margin-top:8px; text-align:center; }
+        .auth-guest { text-align:center; margin-top:16px; }
+        .auth-guest a { color:var(--text-muted); font-size:12px; text-decoration:underline; cursor:pointer; }
+        .auth-divider { display:flex; align-items:center; gap:10px; margin:16px 0 20px; color:var(--text-muted); font-size:12px; }
+        .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+        .knowledge-block { margin-top:8px; }
+        .user-welcome { font-size:13px; color:var(--text-muted); margin-bottom:16px; text-align:center; }
+        .user-welcome strong { color:var(--accent); }
+    </style>
+</head>
+<body class="auth-page">
+
+    <div class="auth-branding">
+        <div class="branding-content">
+            <div class="branding-logo">AA</div>
+            <h1 class="branding-title">AssetAlpha</h1>
+            <p class="branding-subtitle">Профессиональный терминал для фундаментального анализа акций и оптимизации портфеля.</p>
+            <div class="branding-features">
+                <div class="branding-feature">
+                    <div class="feature-icon">✓</div>
+                    6 методов оптимизации: Max Sharpe, Min CVaR, Risk Parity и другие.
+                </div>
+                <div class="branding-feature">
+                    <div class="feature-icon">✓</div>
+                    Реальные метрики: Sortino Ratio, CVaR 95%, Diversification Ratio.
+                </div>
+                <div class="branding-feature">
+                    <div class="feature-icon">✓</div>
+                    100+ тикеров, автоматическое обновление из yfinance + PostgreSQL.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-form-container">
+        <button class="theme-toggle-btn" id="themeToggle" aria-label="Переключить тему">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            </svg>
+        </button>
+
+        <!-- Шаг 1: Auth -->
+        <div id="step-auth">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Войти</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+
+            <!-- Вход -->
+            <div class="auth-section active" id="tab-login">
+                <div class="auth-input-group">
+                    <label>Логин</label>
+                    <input class="auth-input" type="text" id="loginUsername" placeholder="username" autocomplete="username">
+                </div>
+                <div class="auth-input-group">
+                    <label>Пароль</label>
+                    <input class="auth-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div class="auth-error" id="loginError"></div>
+                <button class="auth-btn" id="loginBtn">Войти</button>
+                <div class="auth-divider">или</div>
+                <div class="auth-guest">
+                    <a id="guestLink">Продолжить без регистрации</a>
+                </div>
+            </div>
+
+            <!-- Регистрация -->
+            <div class="auth-section" id="tab-register">
+                <div class="auth-input-group">
+                    <label>Логин</label>
+                    <input class="auth-input" type="text" id="regUsername" placeholder="username" autocomplete="username">
+                </div>
+                <div class="auth-input-group">
+                    <label>Email (необязательно)</label>
+                    <input class="auth-input" type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="auth-input-group">
+                    <label>Пароль (мин. 6 символов)</label>
+                    <input class="auth-input" type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <div class="auth-error" id="regError"></div>
+                <button class="auth-btn" id="regBtn">Создать аккаунт</button>
+            </div>
+        </div>
+
+        <!-- Шаг 2: Уровень знаний (показывается после auth) -->
+        <div id="step-level" style="display:none; text-align:center;">
+            <div class="user-welcome" id="welcomeMsg"></div>
+            <div class="knowledge-block">
+                <h3>Выберите уровень знаний</h3>
+                <p class="knowledge-subtitle">Это поможет настроить интерфейс под вас</p>
+                <div class="btn-group">
+                    <button id="beginnerBtn" class="btn btn-secondary">Новичок</button>
+                    <button id="proBtn" class="btn btn-primary">Профессионал</button>
+                </div>
+                <div id="bootstrapStatus" class="bootstrap-status" style="display:none;"></div>
+            </div>
+            <button id="switchAccountBtn" style="
+                margin-top:24px; background:transparent;
+                border:1px solid var(--border); color:var(--text-muted);
+                padding:8px 22px; border-radius:8px; font-size:13px;
+                cursor:pointer; transition:all .2s;
+            " onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+               onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+                ← Выйти / сменить аккаунт
+            </button>
+        </div>
+
+    </div>
+
+    <script src="js/appState.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
